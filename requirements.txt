@@ -1,0 +1,2 @@
+# Optional: only needed for PDF reports. The GUI, SQLite core and CSV export use the standard library.
+reportlab>=4.0,<5

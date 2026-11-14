@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "module_code": "CSC-40068",
+  "module_title": "Advanced Programming in Python",
+  "academic_year": "2023/24",
+  "programme": "MSc Computer Science",
+  "institution": "Keele University",
+  "final_module_mark_percent": 85,
+  "cats_credits": 15,
+  "mark_evidence": {
+    "source": "Official final academic transcript",
+    "issued": "2025-01-15",
+    "visually_verified": "2026-11-14",
+    "published": false,
+    "scope": "Final module mark, not component marks or a grade for later maintenance"
+  },
+  "programme_source": {
+    "url": "https://www.keele.ac.uk/media/keeleuniversity/sas/qa/pgtprogrammespecifications/pgtprogspecs2023-24/Programme-Specification-Computer-Science-Taught-Masters-2023-24.pdf",
+    "page": 4,
+    "scope": "Module title/code and 15 CATS in the 2023/24 programme"
+  },
+  "repository_base": {
+    "branch": "main",
+    "commit_sha": "52716b324b953ac509370c6637e86b31d3d3c401",
+    "tree_sha": "e13fbaceec65fc9866801ca820e23fd7d007a45d"
+  },
+  "original_material": {
+    "complete_submission_status": "No separate report or certified submitted ZIP located",
+    "artifacts": [
+      {
+        "path": "docs/original/CSC-40068-Assessment-Brief.pdf",
+        "sha256": "ce335829821f1b328afbe450f4006f5f53739e144ee77ebff34126d152c21fab",
+        "size": 297043,
+        "type": "University-authored assessment brief",
+        "pages": 6,
+        "deadline": "2024-01-05",
+        "review": "All six rendered pages and metadata inspected; no student-specific identifier; copied unchanged"
+      }
+    ],
+    "unchanged_repository_source": [
+      {
+        "path": "advancepython.py",
+        "git_blob_sha": "01d53d82c95d7b0266b0e1b3386f361112a1589d"
+      },
+      {
+        "path": "advancepython2.py",
+        "git_blob_sha": "dbe81cb34e454693092d5f4ee81f02fd1682df9b"
+      },
+      {
+        "path": "legacy/advancepython3_2024.py",
+        "git_blob_sha": "a9799b4d0c4165a595b3c3b6a7e7885ea5e5c108"
+      }
+    ]
+  },
+  "maintenance": {
+    "date": "2026-11-14",
+    "ai_assisted": true,
+    "changes": [
+      "Academic and assessment/source mapping",
+      "Original university brief preservation",
+      "Known-header CSV parsing for quoted multiline data",
+      "Canonical SQLite identifier validation",
+      "Behavioural regression tests"
+    ],
+    "not_original_assessment": true,
+    "scope": "Supported local one-product order model differs from original multi-product, five-unit, timed-simulation task"
+  }
+}

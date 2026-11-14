@@ -50,6 +50,21 @@ def _text(value, label, *, optional=False):
     return value.strip()
 
 
+def _identifier(value) -> int:
+    """Reject values SQLite otherwise aliases to another entity's integer ID."""
+    if isinstance(value, bool) or not isinstance(value, (int, str)):
+        raise WarehouseError("ID must be a positive whole number.")
+    try:
+        result = int(value)
+    except (ValueError, TypeError):
+        raise WarehouseError("ID must be a positive whole number.") from None
+    if isinstance(value, str) and str(result) != value.strip():
+        raise WarehouseError("ID must use its canonical whole-number form.")
+    if not 1 <= result <= 2**63 - 1:
+        raise WarehouseError("ID is outside SQLite's positive integer range.")
+    return result
+
+
 class Warehouse:
     """One desktop application's SQLite store; no background workers or service."""
 
@@ -98,6 +113,7 @@ class Warehouse:
 
     @staticmethod
     def _product(con, product_id):
+        product_id = _identifier(product_id)
         row = con.execute("SELECT * FROM products WHERE id=?", (product_id,)).fetchone()
         if row is None:
             raise WarehouseError("Product not found. Refresh inventory and check the product ID.")
@@ -105,6 +121,7 @@ class Warehouse:
 
     @staticmethod
     def _order(con, order_id):
+        order_id = _identifier(order_id)
         row = con.execute("SELECT * FROM orders WHERE id=?", (order_id,)).fetchone()
         if row is None:
             raise WarehouseError("Order not found. Refresh orders and check the order ID.")
@@ -201,22 +218,31 @@ class Warehouse:
     def import_legacy_csv(self, path):
         """Explicitly import old product CSV once; reject all rows on any error."""
         with Path(path).open("r", encoding="utf-8-sig", newline="") as file:
-            sample = file.read(4096)
+            header_line = file.readline()
             file.seek(0)
-            try:
-                dialect = csv.Sniffer().sniff(sample, delimiters=",;")
-            except csv.Error:
-                raise WarehouseError("Cannot identify a comma or semicolon CSV delimiter.") from None
-            reader = csv.DictReader(file, dialect=dialect)
-            if not {"id", "name", "quantity", "specifications"}.issubset(reader.fieldnames or []):
-                raise WarehouseError("Legacy CSV must have id, name, quantity and specifications columns.")
+            required = {"id", "name", "quantity", "specifications"}
+            # Match the known header instead of guessing from free-text data.
+            # Quoted specifications can contain both delimiters and newlines.
+            delimiters = []
+            for delimiter in (",", ";"):
+                fields = next(csv.reader([header_line], delimiter=delimiter), [])
+                if required.issubset(fields) and len(fields) == len(set(fields)):
+                    delimiters.append(delimiter)
+            if len(delimiters) != 1:
+                raise WarehouseError("Legacy CSV must have unique id, name, quantity and specifications columns, separated by comma or semicolon.")
+            reader = csv.DictReader(file, delimiter=delimiters[0], strict=True)
             rows = []
-            for line, row in enumerate(reader, start=2):
-                try:
-                    rows.append((_text(row["name"], "Product name"), _integer(row["quantity"], minimum=0),
-                                 _text(row["specifications"], "Specifications", optional=True)))
-                except WarehouseError as error:
-                    raise WarehouseError(f"CSV row {line}: {error}") from error
+            try:
+                for line, row in enumerate(reader, start=2):
+                    if None in row or any(value is None for value in row.values()):
+                        raise WarehouseError(f"CSV row {line}: column count does not match the header.")
+                    try:
+                        rows.append((_text(row["name"], "Product name"), _integer(row["quantity"], minimum=0),
+                                     _text(row["specifications"], "Specifications", optional=True)))
+                    except WarehouseError as error:
+                        raise WarehouseError(f"CSV row {line}: {error}") from error
+            except csv.Error as error:
+                raise WarehouseError(f"Invalid CSV syntax: {error}") from error
         with self._transaction() as con:
             if con.execute("SELECT 1 FROM products LIMIT 1").fetchone():
                 raise WarehouseError("Legacy import requires an empty inventory to prevent accidental duplicates.")
@@ -266,3 +292,4 @@ class Warehouse:
         title = "Replenishment: zero-stock products" if zero_stock_only else "Warehouse inventory"
         SimpleDocTemplate(str(path), pagesize=A4).build([
             Paragraph(title, styles["Title"]), Spacer(1, 12), table])
+

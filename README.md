@@ -66,3 +66,5 @@ The supported launcher is `advancepython3.py`; `warehouse_gui.py` contains its i
 ## Boundaries
 
 SQLite keeps each inventory/order change and its event in one local transaction. This does not provide server hosting, authentication, distributed execution or a service-level guarantee. Use one desktop application instance per data directory. Source and tests can support descriptions of implemented functionality; they do not establish commercial outcomes or an individual's sole authorship of every change.
+
+**Year provenance:** The `2024` suffix denotes the original Keele MSc academic year **2023/24**. Later uploads and portfolio maintenance retain their own dates; the suffix does not date those later changes.

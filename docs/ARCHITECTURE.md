@@ -2,6 +2,8 @@
 
 This document describes the **10 November 2026 maintenance implementation**. It does not retrospectively describe the original coursework as a production system.
 
+The [14 November verification](verification/2026-11-14.md) records subsequent fixes to CSV import and identifier validation. The [assessment map](ASSESSMENT_AND_PROJECT.md) distinguishes this maintained local model from the original coursework's multi-product orders, five-unit stock cap and timed simulation.
+
 ```mermaid
 flowchart TD
     U["Desktop user"] --> G["Tkinter interface"]
@@ -41,3 +43,4 @@ The database is created beneath the selected data directory, not beside the sour
 Validation failures should produce a concise user-facing message. A path that cannot contain the database is a startup/storage failure and must not be treated as a successful save. Database corruption should be investigated from a copy with the application closed; automatic deletion or silent recreation would hide evidence and may lose data.
 
 The supported application does not silently migrate historical files. Its explicit legacy product importer accepts comma/semicolon CSV, validates the complete file, requires an empty inventory and leaves the source unchanged. Imported products receive new database IDs. Historical order/text logs are not migrated.
+
